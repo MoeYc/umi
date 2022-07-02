@@ -112,6 +112,8 @@ export default async ({
 
   const target = name ? join(cwd, name) : cwd;
   const templateName = args.plugin ? 'plugin' : appTemplate;
+  const extraNpmConfigs =
+    npmClient === 'pnpm' ? `strict-peer-dependencies=false` : '';
 
   const version = require('../package').version;
   const generator = new BaseGenerator({
@@ -123,6 +125,7 @@ export default async ({
           version: version.includes('-canary.') ? version : `^${version}`,
           npmClient,
           registry,
+          extraNpmConfigs,
         },
     questions: args.default ? [] : args.plugin ? pluginPrompts : [],
   });
