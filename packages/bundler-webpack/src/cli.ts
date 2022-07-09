@@ -6,8 +6,6 @@ import { basename, extname, join } from 'path';
 import { build } from './build';
 import { dev } from './dev';
 
-console.log('111: ', 111);
-
 const args = yParser(process.argv.slice(2), {});
 const command = args._[0];
 const cwd = process.cwd();
