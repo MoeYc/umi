@@ -48,4 +48,3 @@ jobs:
           build-script: "build"
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           pattern: "./packages/*/{dist,compiled}/**/*.js"
-          compression: "none"
