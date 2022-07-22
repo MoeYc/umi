@@ -3,7 +3,6 @@ import { spawnSync } from './.internal/utils';
 
 (async () => {
   const args = process.argv.slice(2);
-  console.log('args: ', args);
 
   // no cache
   if (args.includes('--no-cache')) {
@@ -12,6 +11,7 @@ import { spawnSync } from './.internal/utils';
 
   // filter
   if (!args.includes('--filter')) {
+    // Tips: should use double quotes, single quotes are not valid on windows.
     args.unshift('--filter', `"./packages/*"`);
   }
 
@@ -21,7 +21,6 @@ import { spawnSync } from './.internal/utils';
   }
 
   const command = `turbo run ${args.join(' ')}`;
-  console.log('command: ', command);
 
   spawnSync(command, { cwd: PATHS.ROOT });
 })();
