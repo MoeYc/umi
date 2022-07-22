@@ -12,12 +12,12 @@ import { spawnSync } from './.internal/utils';
 
   // filter
   if (!args.includes('--filter')) {
-    args.unshift('--filter', `'./packages/*'`);
+    args.unshift('--filter', `"./packages/*"`);
   }
 
   // turbo cache
   if (!args.includes('--cache-dir')) {
-    args.unshift('--cache-dir', `'.turbo'`);
+    args.unshift('--cache-dir', `".turbo"`);
   }
 
   const command = `turbo run ${args.join(' ')}`;
