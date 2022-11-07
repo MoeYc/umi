@@ -1,5 +1,4 @@
-﻿import { winPath } from '@umijs/utils';
-import { existsSync } from 'fs';
+﻿import { winPath, tryPaths } from '@umijs/utils';
 import { dirname, join } from 'path';
 import { TEMPLATES_DIR } from '../../constants';
 import { IApi } from '../../types';
@@ -62,10 +61,14 @@ export default (api: IApi) => {
         basename: api.config.base,
         historyType: api.config.history.type,
         hydrate: !!api.config.ssr,
-        loadingComponent:
-          existsSync(join(api.paths.absSrcPath, 'loading.tsx')) ||
-          existsSync(join(api.paths.absSrcPath, 'loading.jsx')) ||
-          existsSync(join(api.paths.absSrcPath, 'loading.js')),
+        loadingComponent: tryPaths(
+          [
+            join(api.paths.absSrcPath, 'loading.tsx'),
+            join(api.paths.absSrcPath, 'loading.jsx'),
+            join(api.paths.absSrcPath, 'loading.js'),
+          ],
+          { repeat: false },
+        ),
       },
     });
   });
