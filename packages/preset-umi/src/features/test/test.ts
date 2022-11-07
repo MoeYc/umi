@@ -61,14 +61,9 @@ export default (api: IApi) => {
         basename: api.config.base,
         historyType: api.config.history.type,
         hydrate: !!api.config.ssr,
-        loadingComponent: tryPaths(
-          [
-            join(api.paths.absSrcPath, 'loading.tsx'),
-            join(api.paths.absSrcPath, 'loading.jsx'),
-            join(api.paths.absSrcPath, 'loading.js'),
-          ],
-          { repeat: false },
-        ),
+        loadingComponent: tryPaths(join(api.paths.absSrcPath, 'loading'), {
+          exts: ['.tsx', '.jsx', '.js'],
+        }),
       },
     });
   });

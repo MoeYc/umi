@@ -305,14 +305,10 @@ declare module '*.txt' {
         historyType: api.config.history.type,
         hydrate: !!api.config.ssr,
         reactRouter5Compat: !!api.config.reactRouter5Compat,
-        loadingComponent: tryPaths(
-          [
-            join(api.paths.absSrcPath, 'loading.tsx'),
-            join(api.paths.absSrcPath, 'loading.jsx'),
-            join(api.paths.absSrcPath, 'loading.js'),
-          ],
-          { repeat: false },
-        ),
+        loadingComponent: tryPaths(join(api.paths.absSrcPath, 'loading'), {
+          repeat: false,
+          exts: ['.tsx', '.jsx', '.js'],
+        }),
       },
     });
 

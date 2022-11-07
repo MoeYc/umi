@@ -8,10 +8,26 @@ interface ITryPathsOpts {
    * @default true
    */
   repeat?: boolean;
+  /**
+   * allow file exts list
+   */
+  exts?: string[];
 }
 
-export function tryPaths(paths: string[], opts: ITryPathsOpts = {}) {
-  const { repeat = true } = opts;
+export function tryPaths(paths: string | string[], opts: ITryPathsOpts = {}) {
+  // ensure paths is array
+  if (!Array.isArray(paths)) {
+    paths = [paths];
+  }
+  const { repeat = true, exts } = opts;
+
+  // file extensions
+  if (Array.isArray(exts)) {
+    paths = paths.reduce<string[]>((memo, path) => {
+      return [...memo, ...exts.map((ext) => `${path}${ext}`)];
+    }, []);
+  }
+
   if (repeat) {
     for (const path of paths) {
       if (existsSync(path)) return path;
