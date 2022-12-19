@@ -3,7 +3,6 @@ import chalk from '../compiled/chalk';
 import stripAnsi from '../compiled/strip-ansi';
 import * as logger from './logger';
 import { openBrowser } from './openBrowser';
-import readline from 'readline';
 
 const BORDERS = {
   TL: chalk.gray.dim('╔'),
@@ -34,7 +33,9 @@ export function getDevBanner(
   )} `;
 
   const isOpenShortcuts =
-    !process.env.CI && process.env.UMI_SHORTCUTS !== 'none';
+    !process.env.CI &&
+    process.stdin.isTTY &&
+    process.env.UMI_SHORTCUTS !== 'none';
   const shortcutsHelper = chalk.gray(
     ` Press ${chalk.cyan.bold('h')} to show shortcuts help`,
   );
@@ -134,9 +135,10 @@ function initShortcuts(opts: IInitShortCutsOpts) {
 
   let active = false;
 
-  const onKeypress = async (input: string) => {
+  const onInput = async (input: string) => {
     // ctrl+c or ctrl+d
     if (input === '\x03' || input === '\x04') {
+      process.emit('UMI_STOP_KEYPRESS' as any);
       process.exit(1);
     }
 
@@ -167,9 +169,11 @@ function initShortcuts(opts: IInitShortCutsOpts) {
     active = false;
   };
 
-  readline.emitKeypressEvents(process.stdin);
-  if (process.stdin.isTTY) {
-    process.stdin.setRawMode(true);
-  }
-  process.stdin.on('keypress', onKeypress);
+  process.stdin.setRawMode(true);
+
+  process.stdin.on('data', onInput).setEncoding('utf8').resume();
+
+  process.on('UMI_STOP_KEYPRESS', () => {
+    process.stdin.off('data', onInput).pause();
+  });
 }
