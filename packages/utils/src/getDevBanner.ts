@@ -138,7 +138,7 @@ function initShortcuts(opts: IInitShortCutsOpts) {
   const onInput = async (input: string) => {
     // ctrl+c or ctrl+d
     if (input === '\x03' || input === '\x04') {
-      process.emit('UMI_STOP_KEYPRESS' as any);
+      process.emit('UMI_STOP_KEYSHORTS' as any);
       process.exit(1);
     }
 
@@ -173,7 +173,7 @@ function initShortcuts(opts: IInitShortCutsOpts) {
 
   process.stdin.on('data', onInput).setEncoding('utf8').resume();
 
-  process.on('UMI_STOP_KEYPRESS', () => {
+  process.on('UMI_STOP_KEYSHORTS', () => {
     process.stdin.off('data', onInput).pause();
   });
 }
