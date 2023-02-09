@@ -14,4 +14,3 @@ fixtures
 .turbo
 /packages/renderer-vue/src/index.ts
 /packages/mfsu/fixtures/resolvesContexts/
-/test
