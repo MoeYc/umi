@@ -1,13 +1,9 @@
 import { fsExtra, logger } from '@umijs/utils';
-import { join } from 'path';
-import treeify from '../../compiled/treeify';
+import { join, relative } from 'path';
+import treeify, { type TreeObject } from '../../compiled/treeify';
 import { IApi } from '../types';
 
-export default (api: IApi) => {
-  api.registerCommand({
-    name: 'cache',
-    description: 'run the script commands, manage umi cache',
-    details: `
+const details = `
 umi cache
 
 # clear cache directory
@@ -15,28 +11,46 @@ umi cache clean
 
 # display directory information, --depth is the number of directory levels
 umi cache ls [--depth <depth>]
-`,
+`;
+
+export default (api: IApi) => {
+  api.registerCommand({
+    name: 'cache',
+    description: 'run the script commands, manage umi cache',
+    details,
     configResolveMode: 'loose',
     fn: ({ args }) => {
-      const absCachePath = join(api.paths.absNodeModulesPath, '.cache');
+      const absCachePath = join(
+        api.cwd,
+        api.config.cacheDirectoryPath || 'node_modules/.cache',
+      );
+      const position = relative(api.cwd, absCachePath);
       if (fsExtra.existsSync(absCachePath)) {
         if (args._[0] === 'clean') {
           fsExtra.removeSync(absCachePath);
+          logger.ready(`[umi cache] cache directory is cleaned (${position})`);
         } else if (args._[0] === 'ls') {
           const depth: number = args.depth ?? 1;
           const dirObj = getDirectorySize({
             dir: absCachePath,
             depth: depth + 1,
           });
-          const tree: any = {};
-          const str = `[${getSize(dirObj.size)}] node_modules/.cache`;
+          const tree: Tree = {};
+          const str = `[${getSize(dirObj.size)}] ${position}`;
           tree[str] = dirObj.tree;
           logger.info(
-            `[umi cache] dir info\n${treeify.asTree(tree, true, true)}`,
+            `[umi cache] dir info\n${treeify.asTree(
+              tree as TreeObject,
+              true,
+              true,
+            )}`,
           );
+        } else {
+          logger.warn(`[umi cache] unknown command ${args._[0]}`);
+          console.log(details);
         }
       } else {
-        logger.info('[umi cache] 当前没有缓存');
+        logger.warn(`[umi cache] cache directory is not exists`);
       }
     },
   });
@@ -57,8 +71,8 @@ function getDirectorySize({ dir, depth = 2, current = 1 }: IGetDirectorySize) {
     size: 0,
     tree: null,
   };
-  const isCreateTree = current < depth;
-  if (isCreateTree) {
+  const needCreateTree = current < depth;
+  if (needCreateTree) {
     obj.tree = {};
   }
   const files = fsExtra.readdirSync(dir);
